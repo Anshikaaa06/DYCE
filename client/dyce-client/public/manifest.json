@@ -1,0 +1,41 @@
+{
+  "id": "/",
+  "name": "Dyce - College Dating App",
+  "short_name": "Dyce",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#a06cd5",
+  "orientation": "portrait",
+  "scope": "/",
+  "description": "A modern dating app for college students to connect, vibe, and build genuine relationships.",
+  "icons": [
+    {
+      "src": "/dyce-logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dyce-logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-mobile.png",
+      "type": "image/png",
+      "sizes": "375x667",
+      "label": "Profile screen"
+    },
+    {
+      "src": "/screenshots/screenshot-desktop.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "label": "Home page",
+      "form_factor": "wide"
+    }
+  ]
+}

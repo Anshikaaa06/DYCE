@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String           @id @default(cuid())
+  email                  String           @unique
+  password               String
+  name                   String
+  verified               Boolean          @default(false)
+  otpCode                String? // For email verification
+  otpExpiresAt           DateTime? // For email verification
+  age                    Int?
+  height                 Float?
+  branch                 String?
+  college                String
+  branchVisible          Boolean          @default(true)
+  gender                 String?
+  interests              String[]
+  personalityType        PersonalityType?
+  campusVibeTags         String[]
+  hangoutSpot            String?
+  favoriteArtist         String[]
+  funPrompt1             String?
+  funPrompt2             String?
+  funPrompt3             String?
+  currentMood            String?          @default("love")
+  connectionIntent       String? // 'study_buddy', 'fest_and_fun', 'genuine_connection', 'just_vibing', 'its_complicated'
+  profileImages          Photo[]
+  likesReceived          Like[]           @relation("LikedUser")
+  likesGiven             Like[]           @relation("LikerUser")
+  matches                Match[]          @relation("MatchedUser")
+  matchedWith            Match[]          @relation("MatchingUser")
+  commentsReceived       Comment[]        @relation("CommentedUser")
+  commentsGiven          Comment[]        @relation("CommenterUser")
+  chats                  Chat[]           @relation("Sender")
+  chatPartners           Chat[]           @relation("Receiver")
+  blindDatesInitiated    BlindDate[]      @relation("Initiator")
+  blindDatesMatched      BlindDate[]      @relation("Receiver")
+  allowComments          Boolean          @default(true)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  lastLogin              DateTime?        @default(now())
+  notifications          Notification[]
+  settings               Settings?
+  resetPasswordToken     String? // For password reset
+  resetPasswordExpiresAt DateTime? // For password reset
+  blockedUsers           Block[]    @relation("Blocker")
+  blockedByUsers         Block[]    @relation("Blocked")
+}
+
+enum PersonalityType {
+  INTROVERT
+  EXTROVERT
+  AMBIVERT
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  order     Int
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  liker     User     @relation("LikerUser", fields: [likerId], references: [id], onDelete: Cascade)
+  likerId   String
+  liked     User     @relation("LikedUser", fields: [likedId], references: [id], onDelete: Cascade)
+  likedId   String
+  createdAt DateTime @default(now())
+}
+
+model Match {
+  id            String   @id @default(cuid())
+  user1         User     @relation("MatchedUser", fields: [user1Id], references: [id], onDelete: Cascade)
+  user1Id       String
+  user2         User     @relation("MatchingUser", fields: [user2Id], references: [id], onDelete: Cascade)
+  user2Id       String
+  compatibility Float?
+  createdAt     DateTime @default(now())
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  anonymous   Boolean  @default(true)
+  commenter   User     @relation("CommenterUser", fields: [commenterId], references: [id], onDelete: Cascade)
+  commenterId String
+  user        User     @relation("CommentedUser", fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  createdAt   DateTime @default(now())
+}
+
+model Chat {
+  id            String    @id @default(cuid())
+  sender        User      @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId      String
+  receiver      User      @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId    String
+  message       String
+  mediaUrl      String?
+  type          ChatType  @default(TEXT)
+  createdAt     DateTime  @default(now())
+  starterPrompt String?
+  gameType      GameType?
+}
+
+enum ChatType {
+  TEXT
+  IMAGE
+  VIDEO
+  STICKER
+}
+
+enum GameType {
+  WOULD_YOU_RATHER
+  TRUTH_DARE
+}
+
+model BlindDate {
+  id                     String  @id @default(cuid())
+  initiator              User    @relation("Initiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  initiatorId            String
+  receiver               User    @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId             String
+  active                 Boolean @default(true)
+  // bothAgreeToReveal      Boolean @default(false)
+  initiatorAgreeToReveal Boolean @default(false)
+  receiverAgreeToReveal  Boolean @default(false)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id              String  @id @default(cuid())
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String  @unique
+  theme           Theme   @default(LIGHT)
+  notifications   Boolean @default(true)
+  emailVisibility Boolean @default(true)
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockerId String
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  blockedId String
+  createdAt DateTime @default(now())
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}

@@ -1,0 +1,23 @@
+services:
+  dev-db:
+    image: postgres:16
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: dyce
+    networks:
+      - dyce_app
+  test-db:
+    image: postgres:16
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: dyce
+    networks:
+      - dyce_app
+networks:
+  dyce_app:
